@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 20 60% 97%;
+    --foreground: 220 30% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
+
+    --primary: 10 80% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 174 50% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 20 30% 93%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 35 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 20% 88%;
+    --input: 20 20% 88%;
+    --ring: 10 80% 60%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 10 80% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 20 30% 95%;
+    --sidebar-accent-foreground: 220 30% 15%;
+    --sidebar-border: 20 20% 90%;
+    --sidebar-ring: 10 80% 60%;
+
+    /* Custom tokens */
+    --coral: 10 80% 60%;
+    --coral-light: 10 80% 92%;
+    --teal: 174 50% 45%;
+    --teal-light: 174 40% 90%;
+    --peach: 20 60% 92%;
+    --warm-bg: 20 60% 97%;
+    --mother-gradient: linear-gradient(135deg, hsl(10 80% 60%), hsl(35 90% 55%));
+    --father-gradient: linear-gradient(135deg, hsl(210 70% 50%), hsl(174 50% 45%));
+    --worker-gradient: linear-gradient(135deg, hsl(0 70% 55%), hsl(10 80% 60%));
+    --emergency-gradient: linear-gradient(135deg, hsl(0 90% 45%), hsl(0 80% 55%));
+    --hero-shadow: 0 20px 60px -15px hsl(10 80% 60% / 0.3);
+    --card-shadow: 0 4px 20px -4px hsl(220 30% 15% / 0.08);
+    --card-hover-shadow: 0 8px 30px -6px hsl(220 30% 15% / 0.15);
+  }
+
+  .dark {
+    --background: 220 25% 8%;
+    --foreground: 20 20% 95%;
+    --card: 220 25% 12%;
+    --card-foreground: 20 20% 95%;
+    --popover: 220 25% 12%;
+    --popover-foreground: 20 20% 95%;
+    --primary: 10 80% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 174 50% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 15% 60%;
+    --accent: 35 90% 55%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 10 80% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .gradient-mother {
+    background: var(--mother-gradient);
+  }
+  .gradient-father {
+    background: var(--father-gradient);
+  }
+  .gradient-worker {
+    background: var(--worker-gradient);
+  }
+  .gradient-emergency {
+    background: var(--emergency-gradient);
+  }
+  .shadow-hero {
+    box-shadow: var(--hero-shadow);
+  }
+  .shadow-card {
+    box-shadow: var(--card-shadow);
+  }
+  .shadow-card-hover {
+    box-shadow: var(--card-hover-shadow);
+  }
+}
