@@ -267,7 +267,7 @@ const FatherDashboard = () => {
                 { title: "Sukhaprasavam (Telugu)", author: "G. Samaram", desc: "A classic Telugu pregnancy book that discusses prenatal care, childbirth, and mental preparedness in simple language.", icon: "🌿" },
                 { title: "Aai Hotana (Hindi)", author: "Prayas Health Group", desc: "A sensitive and simple booklet for pregnant women covering emotional and physical changes during pregnancy.", icon: "👶" },
                 { title: "Garbha Samskara Pregnancy Guide (Kannada)", author: "pregnancy care principles", desc: " Explains positive practices, prenatal rituals, and mental well-being during pregnancy, drawing from cultural and supportive guidance.", icon: "📊" },
-                { title: "கர்ப்பம் மற்றும் குழந்தைப் பராமரிப்பு (Karppam Matrum Kuzhanthaip Paaramarippu)", author: "Dr. N. Meenakshi (Pregnancy & Childcare Guide)", desc: " A helpful Tamil book that explains pregnancy stages, women’s health care, nutrition tips,", icon: "👨‍👩‍👧" },
+                { title: "கர்ப்பம் மற்றும் குழந்தைப் பராமரிப்பு (Karppam Matrum Kuzhanthaip Paaramarippu)", author: "Dr. N. Meenakshi (Pregnancy & Childcare Guide)", desc: "A helpful Tamil book that explains pregnancy stages, women’s health care, nutrition tips", icon: "👨‍👩‍👧" },
               ].map((book, i) => (
                 <div key={i} className="flex items-start gap-3 py-3 border-b border-border last:border-0">
                   <span className="text-2xl">{book.icon}</span>
