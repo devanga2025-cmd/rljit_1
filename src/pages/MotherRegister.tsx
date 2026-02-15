@@ -49,7 +49,7 @@ const MotherRegister = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check consent before proceeding
     const consent = localStorage.getItem("privacyConsent_mother");
     if (!consent) {
@@ -64,7 +64,7 @@ const MotherRegister = () => {
 
   const proceedWithRegistration = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (!isLogin) {
       if (!form.lmpDate) {
         toast.error("Please enter your Last Menstrual Period (LMP) date");
@@ -143,7 +143,7 @@ const MotherRegister = () => {
                       <Label htmlFor="age" className="font-heading font-semibold">Age</Label>
                       <Input id="age" type="number" placeholder="Age" value={form.age} onChange={(e) => {
                         const val = e.target.value;
-                        if (val === "" || (parseInt(val) >= 20 && parseInt(val) <= 30)) {
+                        if (val === "" || /^\d+$/.test(val)) {
                           handleChange("age", val);
                         }
                       }} required min={20} max={30} />
@@ -222,7 +222,7 @@ const MotherRegister = () => {
         </Card>
       </main>
       <EmergencyButton />
-      
+
       <PrivacyConsentDialog
         open={showConsentDialog}
         onAccept={handleConsentAccept}

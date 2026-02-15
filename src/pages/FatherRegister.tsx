@@ -35,7 +35,7 @@ const FatherRegister = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check consent before proceeding
     const consent = localStorage.getItem("privacyConsent_father");
     if (!consent) {
@@ -50,7 +50,7 @@ const FatherRegister = () => {
 
   const proceedWithRegistration = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (!isLogin) {
       localStorage.setItem("fatherName", form.fatherName);
       localStorage.setItem("fatherWifeName", form.wifeName);
@@ -114,7 +114,7 @@ const FatherRegister = () => {
                       <Label htmlFor="wifeAge" className="font-heading font-semibold">Wife's Age</Label>
                       <Input id="wifeAge" type="number" placeholder="Age" value={form.wifeAge} onChange={(e) => {
                         const val = e.target.value;
-                        if (val === "" || (parseInt(val) >= 20 && parseInt(val) <= 30)) {
+                        if (val === "" || /^\d+$/.test(val)) {
                           handleChange("wifeAge", val);
                         }
                       }} required min={20} max={30} />
@@ -149,7 +149,7 @@ const FatherRegister = () => {
         </Card>
       </main>
       <EmergencyButton />
-      
+
       <PrivacyConsentDialog
         open={showConsentDialog}
         onAccept={handleConsentAccept}
