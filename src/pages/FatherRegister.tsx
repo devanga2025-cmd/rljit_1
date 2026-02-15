@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import EmergencyButton from "@/components/EmergencyButton";
+import PrivacyConsentDialog from "@/components/PrivacyConsentDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Users, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const FatherRegister = () => {
   const navigate = useNavigate();
@@ -21,18 +23,55 @@ const FatherRegister = () => {
     gmail: "",
     password: "",
   });
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<React.FormEvent<HTMLFormElement> | null>(null);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Note: Consent dialog will be shown when form is submitted if consent is missing
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check consent before proceeding
+    const consent = localStorage.getItem("privacyConsent_father");
+    if (!consent) {
+      setPendingFormData(e);
+      setFormSubmitted(true);
+      setShowConsentDialog(true);
+      return;
+    }
+
+    proceedWithRegistration(e);
+  };
+
+  const proceedWithRegistration = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
     if (!isLogin) {
       localStorage.setItem("fatherName", form.fatherName);
       localStorage.setItem("fatherWifeName", form.wifeName);
     }
     navigate("/father");
+  };
+
+  const handleConsentAccept = () => {
+    setShowConsentDialog(false);
+    if (formSubmitted && pendingFormData) {
+      proceedWithRegistration();
+      setFormSubmitted(false);
+      setPendingFormData(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentDialog(false);
+    setFormSubmitted(false);
+    setPendingFormData(null);
+    toast.error("Registration cancelled. Consent is required to proceed.");
   };
 
   return (
@@ -73,7 +112,13 @@ const FatherRegister = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="wifeAge" className="font-heading font-semibold">Wife's Age</Label>
-                      <Input id="wifeAge" type="number" placeholder="Age" value={form.wifeAge} onChange={(e) => handleChange("wifeAge", e.target.value)} required min={14} max={60} />
+                      <Input id="wifeAge" type="number" placeholder="Age" value={form.wifeAge} onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "" || (parseInt(val) >= 20 && parseInt(val) <= 30)) {
+                          handleChange("wifeAge", val);
+                        }
+                      }} required min={20} max={30} />
+                      <p className="text-xs text-muted-foreground">Age must be between 20-30</p>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -104,6 +149,13 @@ const FatherRegister = () => {
         </Card>
       </main>
       <EmergencyButton />
+      
+      <PrivacyConsentDialog
+        open={showConsentDialog}
+        onAccept={handleConsentAccept}
+        onCancel={handleConsentCancel}
+        userType="father"
+      />
     </div>
   );
 };

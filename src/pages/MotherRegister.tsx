@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useApp } from "@/contexts/AppContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import EmergencyButton from "@/components/EmergencyButton";
+import PrivacyConsentDialog from "@/components/PrivacyConsentDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,9 @@ const MotherRegister = () => {
   });
   const [calculatedWeek, setCalculatedWeek] = useState<number | null>(null);
   const [calculatedDueDate, setCalculatedDueDate] = useState<string>("");
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<React.FormEvent | null>(null);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -41,11 +45,37 @@ const MotherRegister = () => {
     }
   };
 
+  // Note: Consent dialog will be shown when form is submitted if consent is missing
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check consent before proceeding
+    const consent = localStorage.getItem("privacyConsent_mother");
+    if (!consent) {
+      setPendingFormData(e);
+      setFormSubmitted(true);
+      setShowConsentDialog(true);
+      return;
+    }
+
+    proceedWithRegistration(e);
+  };
+
+  const proceedWithRegistration = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
     if (!isLogin) {
       if (!form.lmpDate) {
         toast.error("Please enter your Last Menstrual Period (LMP) date");
+        return;
+      }
+      if (parseInt(form.age) < 20 || parseInt(form.age) > 30) {
+        toast.error("Age must be between 20 and 30");
+        return;
+      }
+      if (form.phone.length !== 10) {
+        toast.error("Phone number must be exactly 10 digits");
         return;
       }
       registerMother({
@@ -59,6 +89,22 @@ const MotherRegister = () => {
       localStorage.setItem("motherName", form.name);
     }
     navigate("/mother");
+  };
+
+  const handleConsentAccept = () => {
+    setShowConsentDialog(false);
+    if (formSubmitted && pendingFormData) {
+      proceedWithRegistration();
+      setFormSubmitted(false);
+      setPendingFormData(null);
+    }
+  };
+
+  const handleConsentCancel = () => {
+    setShowConsentDialog(false);
+    setFormSubmitted(false);
+    setPendingFormData(null);
+    toast.error("Registration cancelled. Consent is required to proceed.");
   };
 
   return (
@@ -95,11 +141,21 @@ const MotherRegister = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="age" className="font-heading font-semibold">Age</Label>
-                      <Input id="age" type="number" placeholder="Age" value={form.age} onChange={(e) => handleChange("age", e.target.value)} required min={14} max={60} />
+                      <Input id="age" type="number" placeholder="Age" value={form.age} onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "" || (parseInt(val) >= 20 && parseInt(val) <= 30)) {
+                          handleChange("age", val);
+                        }
+                      }} required min={20} max={30} />
+                      <p className="text-xs text-muted-foreground">Age must be between 20-30</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone" className="font-heading font-semibold">Phone Number</Label>
-                      <Input id="phone" type="tel" placeholder="98XXXXXXXX" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)} required />
+                      <Input id="phone" type="tel" placeholder="98XXXXXXXX" value={form.phone} onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                        handleChange("phone", val);
+                      }} required minLength={10} maxLength={10} />
+                      <p className="text-xs text-muted-foreground">10 digits only</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -166,6 +222,13 @@ const MotherRegister = () => {
         </Card>
       </main>
       <EmergencyButton />
+      
+      <PrivacyConsentDialog
+        open={showConsentDialog}
+        onAccept={handleConsentAccept}
+        onCancel={handleConsentCancel}
+        userType="mother"
+      />
     </div>
   );
 };

@@ -29,7 +29,6 @@ const FatherDashboard = () => {
     { id: "tasks", label: t("support.tasks"), icon: CheckCircle2 },
     { id: "guidance", label: t("weekly.guidance"), icon: Baby },
     { id: "health", label: "Doctors & Medicine", icon: Stethoscope },
-    { id: "notifications", label: t("notifications"), icon: Bell },
     { id: "emergency", label: t("emergency"), icon: Phone },
   ];
 
@@ -83,9 +82,8 @@ const FatherDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
-                  activeTab === tab.id ? "gradient-father text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${activeTab === tab.id ? "gradient-father text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+                  }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
                 {tab.label}
@@ -154,22 +152,20 @@ const FatherDashboard = () => {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleConfirmTransport}
-                className={`rounded-xl p-4 font-heading font-bold text-sm text-center ${
-                  mother.transportReady
-                    ? "bg-secondary/20 text-secondary border-2 border-secondary"
-                    : "gradient-father text-primary-foreground"
-                }`}
+                className={`rounded-xl p-4 font-heading font-bold text-sm text-center ${mother.transportReady
+                  ? "bg-secondary/20 text-secondary border-2 border-secondary"
+                  : "gradient-father text-primary-foreground"
+                  }`}
               >
                 <Truck className="w-6 h-6 mx-auto mb-1" />
                 {mother.transportReady ? "✅ Transport Ready" : "Confirm Transport"}
               </button>
               <button
                 onClick={() => setActiveTab("tasks")}
-                className={`rounded-xl p-4 font-heading font-bold text-sm text-center ${
-                  mother.hospitalBagReady
-                    ? "bg-secondary/20 text-secondary border-2 border-secondary"
-                    : "bg-accent text-accent-foreground"
-                }`}
+                className={`rounded-xl p-4 font-heading font-bold text-sm text-center ${mother.hospitalBagReady
+                  ? "bg-secondary/20 text-secondary border-2 border-secondary"
+                  : "bg-accent text-accent-foreground"
+                  }`}
               >
                 <Briefcase className="w-6 h-6 mx-auto mb-1" />
                 {mother.hospitalBagReady ? "✅ Bag Ready" : "Pack Hospital Bag"}
@@ -205,9 +201,8 @@ const FatherDashboard = () => {
                   <button
                     key={task.id}
                     onClick={() => toggleFatherTask(task.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${
-                      task.done ? "bg-secondary/10" : "bg-muted"
-                    }`}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all ${task.done ? "bg-secondary/10" : "bg-muted"
+                      }`}
                   >
                     {task.done ? <CheckCircle2 className="w-5 h-5 text-secondary shrink-0" /> : <Circle className="w-5 h-5 text-muted-foreground shrink-0" />}
                     <span className={`text-sm ${task.done ? "line-through text-muted-foreground" : "text-card-foreground"}`}>{task.task}</span>
@@ -268,11 +263,11 @@ const FatherDashboard = () => {
               </h3>
               <p className="text-xs text-muted-foreground mb-3">Reading reduces stress and helps bonding – surprise her with one!</p>
               {[
-                { title: "What to Expect When You're Expecting", author: "Heidi Murkoff", desc: "The #1 pregnancy guide – covers every week of pregnancy", icon: "📖" },
-                { title: "The Mama Natural Week-by-Week Guide", author: "Genevieve Howland", desc: "Natural pregnancy guide with nutrition & exercise tips", icon: "🌿" },
-                { title: "Ina May's Guide to Childbirth", author: "Ina May Gaskin", desc: "Empowering natural birth stories and techniques", icon: "👶" },
-                { title: "Expecting Better", author: "Emily Oster", desc: "Data-driven pregnancy decisions – myth-busting guide", icon: "📊" },
-                { title: "The Birth Partner", author: "Penny Simkin", desc: "Perfect for fathers – how to support during labor", icon: "👨‍👩‍👧" },
+                { title: "The Pregnancy Book", author: "Public Health Agency (Northern Ireland)", desc: " Comprehensive guide covering pregnancy stages, health tips, antenatal care and emotional support for expectant mothers", icon: "📖" },
+                { title: "Sukhaprasavam (Telugu)", author: "G. Samaram", desc: "A classic Telugu pregnancy book that discusses prenatal care, childbirth, and mental preparedness in simple language.", icon: "🌿" },
+                { title: "Aai Hotana (Hindi)", author: "Prayas Health Group", desc: "A sensitive and simple booklet for pregnant women covering emotional and physical changes during pregnancy.", icon: "👶" },
+                { title: "Garbha Samskara Pregnancy Guide (Kannada)", author: "pregnancy care principles", desc: " Explains positive practices, prenatal rituals, and mental well-being during pregnancy, drawing from cultural and supportive guidance.", icon: "📊" },
+                { title: "கர்ப்பம் மற்றும் குழந்தைப் பராமரிப்பு (Karppam Matrum Kuzhanthaip Paaramarippu)", author: "Dr. N. Meenakshi (Pregnancy & Childcare Guide)", desc: " A helpful Tamil book that explains pregnancy stages, women’s health care, nutrition tips,", icon: "👨‍👩‍👧" },
               ].map((book, i) => (
                 <div key={i} className="flex items-start gap-3 py-3 border-b border-border last:border-0">
                   <span className="text-2xl">{book.icon}</span>
@@ -323,7 +318,7 @@ const FatherDashboard = () => {
               <h3 className="font-heading font-bold text-card-foreground mb-3 flex items-center gap-2">
                 <Pill className="w-5 h-5 text-destructive" /> 💊 Essential Tablets & Medicine
               </h3>
-              <p className="text-xs text-destructive font-bold mb-3">⚠️ Always consult a doctor before giving any medicine</p>
+              <p className="text-xs text-destructive font-bold mb-3">⚠️ Always consult a doctor before taking any medicine</p>
               {[
                 { name: "IFA Tablets (Iron + Folic Acid)", purpose: "Prevents anemia – take 1 daily after meals", status: "Daily", icon: "🔴" },
                 { name: "Calcium Tablets (500mg)", purpose: "Strong bones for mother & baby – take 2 daily", status: "Daily", icon: "🦴" },
@@ -337,9 +332,8 @@ const FatherDashboard = () => {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-heading font-semibold text-card-foreground">{med.name}</p>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        med.status === "Daily" ? "bg-secondary/20 text-secondary" : med.status === "Emergency" ? "bg-destructive/20 text-destructive" : "bg-accent/20 text-accent"
-                      }`}>{med.status}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${med.status === "Daily" ? "bg-secondary/20 text-secondary" : med.status === "Emergency" ? "bg-destructive/20 text-destructive" : "bg-accent/20 text-accent"
+                        }`}>{med.status}</span>
                     </div>
                     <p className="text-xs text-muted-foreground">{med.purpose}</p>
                   </div>
@@ -357,23 +351,6 @@ const FatherDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {activeTab === "notifications" && (
-          <div className="space-y-3 animate-slide-up">
-            {[
-              { msg: `Next ANC visit on ${mother.nextANC}`, type: "info" },
-              { msg: "Reminder: Buy iron supplements this week", type: "info" },
-              { msg: "Delivery preparation: Pack hospital bag by Week 36", type: "warning" },
-              ...notifications.map(n => ({ msg: n.message, type: n.type })),
-            ].map((n, i) => (
-              <div key={i} className={`bg-card rounded-xl p-4 shadow-card border-l-4 ${
-                n.type === "urgent" ? "border-destructive" : n.type === "warning" ? "border-accent" : "border-secondary"
-              }`}>
-                <p className="text-sm text-card-foreground">{n.msg}</p>
-              </div>
-            ))}
           </div>
         )}
 

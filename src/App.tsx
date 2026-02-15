@@ -12,6 +12,7 @@ import WorkerRegister from "./pages/WorkerRegister";
 import MotherDashboard from "./pages/MotherDashboard";
 import FatherDashboard from "./pages/FatherDashboard";
 import WorkerDashboard from "./pages/WorkerDashboard";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
               <Route path="/mother" element={<MotherDashboard />} />
               <Route path="/father" element={<FatherDashboard />} />
               <Route path="/worker" element={<WorkerDashboard />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

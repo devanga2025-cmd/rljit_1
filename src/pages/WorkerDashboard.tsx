@@ -6,7 +6,8 @@ import EmergencyButton from "@/components/EmergencyButton";
 import {
   Users, AlertTriangle, Bell, ClipboardList, FileText,
   Eye, Calendar, Phone, CheckCircle2, XCircle, Search,
-  ShieldAlert, Send, Download, UserCheck, Image
+  ShieldAlert, Send, Download, UserCheck, Image, Stethoscope,
+  BookOpen, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import mcpCardImage from "@/assets/mcp-taayi-card.jpeg";
@@ -34,6 +35,7 @@ const WorkerDashboard = () => {
     { id: "alerts", label: "Alerts", icon: Bell },
     { id: "highrisk", label: t("high.risk"), icon: AlertTriangle },
     { id: "visits", label: t("visit.tracking"), icon: ClipboardList },
+    { id: "delivery", label: "Delivery Guidance", icon: Stethoscope },
     { id: "mcpcard", label: "MCP Card", icon: Image },
     { id: "reports", label: t("reports"), icon: FileText },
   ];
@@ -400,6 +402,199 @@ const WorkerDashboard = () => {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "delivery" && (
+          <div className="space-y-6 animate-slide-up">
+            {/* Anganwadi Delivery Guidance */}
+            <div className="bg-card rounded-2xl p-5 shadow-card border-2 border-primary/20">
+              <h3 className="font-heading font-bold text-lg text-card-foreground mb-4 flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-primary" /> Delivery Options Education Guide
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Use this guide to educate mothers and families about delivery options. Share this information during home visits and ANC counseling sessions.
+              </p>
+
+              <div className="space-y-4">
+                <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/20">
+                  <h4 className="font-heading font-semibold text-sm text-card-foreground mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" /> Your Key Responsibilities
+                  </h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Identify high-risk mothers early in pregnancy
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Refer mothers to hospital on time when complications are detected
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Educate family about danger signs during pregnancy and delivery
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Encourage institutional delivery (hospital/clinic) instead of home delivery
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Help families understand when C-section is medically necessary
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ChevronRight className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                      Support birth preparedness planning (transport, hospital selection, blood donor)
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
+                  <h4 className="font-heading font-semibold text-sm text-card-foreground mb-2 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-blue-500" /> When to Refer for C-Section
+                  </h4>
+                  <p className="text-xs text-muted-foreground mb-2">Refer immediately if mother has:</p>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    <li>• High blood pressure (severe preeclampsia)</li>
+                    <li>• Severe anemia (Hb &lt; 7 g/dL)</li>
+                    <li>• Baby in breech position (legs first)</li>
+                    <li>• Placenta covering cervix (placenta previa)</li>
+                    <li>• Previous multiple C-sections</li>
+                    <li>• Labor not progressing after many hours</li>
+                    <li>• Baby not getting enough oxygen</li>
+                  </ul>
+                </div>
+
+                <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20">
+                  <h4 className="font-heading font-semibold text-sm text-card-foreground mb-2 flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-yellow-500" /> Important Messages for Families
+                  </h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      Normal delivery is natural and safe in most healthy pregnancies
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      C-section should ONLY be done when medically necessary - it is major surgery
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      Always follow doctor's advice - do not force delivery type
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      Home delivery is unsafe - always go to hospital/clinic
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      Birth preparedness (transport, hospital, blood donor) saves lives
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-red-500/10 rounded-lg p-4 border border-red-500/20">
+                  <h4 className="font-heading font-semibold text-sm text-card-foreground mb-2 flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-red-500" /> Common Myths to Address
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <p className="text-muted-foreground mb-1">
+                        <span className="text-red-500 font-semibold">Myth:</span> C-section is easier than normal delivery
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        <span className="text-green-500 font-semibold">Fact:</span> C-section is major surgery with longer recovery (6-8 weeks vs 2-6 weeks)
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1">
+                        <span className="text-red-500 font-semibold">Myth:</span> Once C-section, always C-section
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        <span className="text-green-500 font-semibold">Fact:</span> VBAC (vaginal birth after C-section) is possible if doctor approves
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground mb-1">
+                        <span className="text-red-500 font-semibold">Myth:</span> Normal delivery damages body permanently
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        <span className="text-green-500 font-semibold">Fact:</span> With proper care and exercises, recovery is very good
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-secondary/10 rounded-lg p-4 border border-secondary/20">
+                  <h4 className="font-heading font-semibold text-sm text-card-foreground mb-2 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-secondary" /> Counseling Checklist
+                  </h4>
+                  <p className="text-xs text-muted-foreground mb-2">During your visits, ensure mothers know:</p>
+                  <ul className="space-y-1.5 text-sm text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+                      Advantages of normal delivery (faster recovery, lower cost, better for baby)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+                      When C-section is medically necessary
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+                      Importance of institutional delivery
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+                      Birth preparedness (hospital, transport, blood donor, money saved)
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
+                      Danger signs that require immediate hospital visit
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Reference Card */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <h3 className="font-heading font-bold text-lg text-card-foreground mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" /> Quick Reference: Normal vs C-Section
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 px-3 font-heading font-semibold text-card-foreground">Feature</th>
+                      <th className="text-left py-2 px-3 font-heading font-semibold text-green-500">Normal Delivery</th>
+                      <th className="text-left py-2 px-3 font-heading font-semibold text-red-500">C-Section</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border">
+                      <td className="py-2 px-3 text-muted-foreground">Hospital Stay</td>
+                      <td className="py-2 px-3 text-green-600">1–2 days</td>
+                      <td className="py-2 px-3 text-red-600">3–5 days</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 px-3 text-muted-foreground">Recovery Time</td>
+                      <td className="py-2 px-3 text-green-600">2–6 weeks</td>
+                      <td className="py-2 px-3 text-red-600">6–8 weeks</td>
+                    </tr>
+                    <tr className="border-b border-border">
+                      <td className="py-2 px-3 text-muted-foreground">Pain</td>
+                      <td className="py-2 px-3 text-green-600">Labor pain</td>
+                      <td className="py-2 px-3 text-red-600">Surgery pain</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-3 text-muted-foreground">Future Pregnancy</td>
+                      <td className="py-2 px-3 text-green-600">Easier</td>
+                      <td className="py-2 px-3 text-red-600">Needs monitoring</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         )}
 

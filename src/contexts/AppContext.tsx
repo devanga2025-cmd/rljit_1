@@ -90,6 +90,8 @@ interface AppContextType {
   sendReminder: (motherIndex: number, reminderType: string) => void;
   confirmTransport: (motherIndex: number) => void;
   updateHospitalBag: (motherIndex: number, item: string, checked: boolean) => void;
+  updateFatherDetails: (motherIndex: number, fatherName: string, fatherPhone: string) => void;
+  updateHealthData: (motherIndex: number, data: { bp?: string; hemoglobin?: number; ttVaccine?: boolean; ancVisits?: number }) => void;
   chatMessages: ChatMessage[];
   sendChatMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
   registerMother: (data: Partial<MotherData>) => void;
@@ -347,6 +349,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, [addNotification]);
 
+  const updateFatherDetails = useCallback((motherIndex: number, fatherName: string, fatherPhone: string) => {
+    setMothers(prev => prev.map((m, i) => {
+      if (i !== motherIndex) return m;
+      toast.success("Father details updated successfully");
+      return { ...m, fatherName, emergencyContact: fatherPhone };
+    }));
+  }, []);
+
+  const updateHealthData = useCallback((motherIndex: number, data: { bp?: string; hemoglobin?: number; ttVaccine?: boolean; ancVisits?: number }) => {
+    setMothers(prev => prev.map((m, i) => {
+      if (i !== motherIndex) return m;
+      const updated = { ...m };
+      if (data.bp !== undefined) updated.bp = data.bp;
+      if (data.hemoglobin !== undefined) updated.hemoglobin = data.hemoglobin;
+      if (data.ttVaccine !== undefined) updated.ttVaccine = data.ttVaccine;
+      if (data.ancVisits !== undefined) updated.ancVisits = data.ancVisits;
+      toast.success("Health data updated successfully");
+      return updated;
+    }));
+  }, []);
+
   const sendChatMessage = useCallback((msg: Omit<ChatMessage, "id" | "timestamp">) => {
     const newMsg = { ...msg, id: Date.now().toString(), timestamp: new Date() };
     setChatMessages(prev => [...prev, newMsg]);
@@ -422,7 +445,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       visits, addVisit, fatherTasks, toggleFatherTask,
       updateMotherWeight, markIFATaken, reportSymptoms, addFamilyMember,
       checkSchemeEligibility, verifyMother, markHighRisk, sendReminder,
-      confirmTransport, updateHospitalBag, chatMessages, sendChatMessage,
+      confirmTransport, updateHospitalBag, updateFatherDetails, updateHealthData, chatMessages, sendChatMessage,
       registerMother, generateReport
     }}>
       {children}
