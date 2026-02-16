@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useApp } from "@/contexts/AppContext";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -16,9 +16,20 @@ const WorkerDashboard = () => {
   const { t } = useLanguage();
   const {
     mothers, notifications, visits, addVisit,
-    verifyMother, markHighRisk, sendReminder, generateReport, addNotification
+    verifyMother, markHighRisk, sendReminder, generateReport, addNotification,
+    fetchMothers
   } = useApp();
   const [activeTab, setActiveTab] = useState("registry");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      await fetchMothers();
+      setIsLoading(false);
+    };
+    loadData();
+  }, [fetchMothers]);
   const [filterRisk, setFilterRisk] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMother, setSelectedMother] = useState<number | null>(null);
@@ -116,9 +127,8 @@ const WorkerDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${
-                  activeTab === tab.id ? "gradient-worker text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-heading font-semibold whitespace-nowrap transition-all ${activeTab === tab.id ? "gradient-worker text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+                  }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
                 {tab.label}
@@ -164,61 +174,67 @@ const WorkerDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-2xl shadow-card overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-muted">
-                      <th className="text-left px-4 py-3 font-heading font-semibold text-muted-foreground">Name</th>
-                      <th className="text-left px-4 py-3 font-heading font-semibold text-muted-foreground">Village</th>
-                      <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Week</th>
-                      <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Risk</th>
-                      <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Status</th>
-                      <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredMothers.map((m, i) => {
-                      const realIdx = mothers.findIndex(mot => mot.id === m.id);
-                      return (
-                        <tr key={m.id} className="border-t border-border hover:bg-muted/50 transition-colors">
-                          <td className="px-4 py-3 font-heading font-semibold text-card-foreground">{m.name}</td>
-                          <td className="px-4 py-3 text-muted-foreground">{m.village}</td>
-                          <td className="px-4 py-3 text-center">{m.pregnancyWeek}</td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              m.riskLevel === "high" ? "bg-destructive/15 text-destructive" :
-                              m.riskLevel === "medium" ? "bg-accent/15 text-accent" :
-                              "bg-secondary/15 text-secondary"
-                            }`}>{m.riskLevel.toUpperCase()}</span>
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            {m.verified ? <CheckCircle2 className="w-4 h-4 text-secondary mx-auto" /> : <XCircle className="w-4 h-4 text-accent mx-auto" />}
-                          </td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center justify-center gap-1">
-                              <button onClick={() => setSelectedMother(realIdx)} className="text-primary hover:text-primary/80 p-1" title="View">
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              {!m.verified && (
-                                <button onClick={() => handleVerify(realIdx)} className="text-secondary hover:text-secondary/80 p-1" title="Verify">
-                                  <UserCheck className="w-4 h-4" />
-                                </button>
-                              )}
-                              {m.riskLevel !== "high" && (
-                                <button onClick={() => handleMarkHighRisk(realIdx)} className="text-destructive hover:text-destructive/80 p-1" title="Mark High Risk">
-                                  <ShieldAlert className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            {isLoading ? (
+              <div className="bg-card rounded-2xl p-12 text-center shadow-card">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-muted-foreground font-heading">Fetching real-time registry...</p>
               </div>
-            </div>
+            ) : (
+              <div className="bg-card rounded-2xl shadow-card overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-muted">
+                        <th className="text-left px-4 py-3 font-heading font-semibold text-muted-foreground">Name</th>
+                        <th className="text-left px-4 py-3 font-heading font-semibold text-muted-foreground">Village</th>
+                        <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Week</th>
+                        <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Risk</th>
+                        <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Status</th>
+                        <th className="text-center px-4 py-3 font-heading font-semibold text-muted-foreground">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredMothers.map((m, i) => {
+                        const realIdx = mothers.findIndex(mot => mot.id === m.id);
+                        return (
+                          <tr key={m.id} className="border-t border-border hover:bg-muted/50 transition-colors">
+                            <td className="px-4 py-3 font-heading font-semibold text-card-foreground">{m.name}</td>
+                            <td className="px-4 py-3 text-muted-foreground">{m.village}</td>
+                            <td className="px-4 py-3 text-center">{m.pregnancyWeek}</td>
+                            <td className="px-4 py-3 text-center">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${m.riskLevel === "high" ? "bg-destructive/15 text-destructive" :
+                                m.riskLevel === "medium" ? "bg-accent/15 text-accent" :
+                                  "bg-secondary/15 text-secondary"
+                                }`}>{m.riskLevel.toUpperCase()}</span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {m.verified ? <CheckCircle2 className="w-4 h-4 text-secondary mx-auto" /> : <XCircle className="w-4 h-4 text-accent mx-auto" />}
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center justify-center gap-1">
+                                <button onClick={() => setSelectedMother(realIdx)} className="text-primary hover:text-primary/80 p-1" title="View">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                {!m.verified && (
+                                  <button onClick={() => handleVerify(realIdx)} className="text-secondary hover:text-secondary/80 p-1" title="Verify">
+                                    <UserCheck className="w-4 h-4" />
+                                  </button>
+                                )}
+                                {m.riskLevel !== "high" && (
+                                  <button onClick={() => handleMarkHighRisk(realIdx)} className="text-destructive hover:text-destructive/80 p-1" title="Mark High Risk">
+                                    <ShieldAlert className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {selectedMother !== null && (
               <div className="bg-card rounded-2xl p-5 shadow-card border-2 border-primary/20 animate-slide-up">
@@ -226,6 +242,51 @@ const WorkerDashboard = () => {
                   <h3 className="font-heading font-bold text-lg text-card-foreground">{mothers[selectedMother].name}</h3>
                   <button onClick={() => setSelectedMother(null)} className="text-muted-foreground hover:text-foreground">✕</button>
                 </div>
+
+                {/* Medical Alert Panel */}
+                {(mothers[selectedMother].riskLevel === "high" || mothers[selectedMother].bloodGroup?.endsWith("-") || mothers[selectedMother].medicalHistory?.conditions?.length > 0) && (
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-xl p-4 mb-4">
+                    <h4 className="font-heading font-bold text-destructive mb-2 flex items-center gap-2">
+                      <ShieldAlert className="w-5 h-5" /> Medical Attention Required
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Blood Group</p>
+                        <p className={`font-bold ${mothers[selectedMother].bloodGroup?.endsWith("-") ? "text-destructive" : "text-card-foreground"}`}>
+                          {mothers[selectedMother].bloodGroup || "Unknown"}
+                          {mothers[selectedMother].bloodGroup?.endsWith("-") && " (Rh-)"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Risk Level</p>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${mothers[selectedMother].riskLevel === "high" ? "bg-destructive text-destructive-foreground" :
+                          mothers[selectedMother].riskLevel === "medium" ? "bg-accent text-accent-foreground" :
+                            "bg-secondary text-secondary-foreground"
+                          }`}>
+                          {mothers[selectedMother].riskLevel.toUpperCase()}
+                        </span>
+                      </div>
+                      {mothers[selectedMother].medicalHistory?.conditions?.length > 0 && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-muted-foreground mb-1">Pre-Existing Conditions</p>
+                          <div className="flex flex-wrap gap-1">
+                            {mothers[selectedMother].medicalHistory.conditions.map(c => (
+                              <span key={c} className="bg-destructive/10 text-destructive border border-destructive/20 px-2 py-0.5 rounded text-xs font-bold">
+                                {c}
+                              </span>
+                            ))}
+                            {mothers[selectedMother].medicalHistory?.otherCondition && (
+                              <span className="bg-destructive/10 text-destructive border border-destructive/20 px-2 py-0.5 rounded text-xs font-bold">
+                                {mothers[selectedMother].medicalHistory.otherCondition}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                   {[
                     ["Village", mothers[selectedMother].village],
@@ -234,6 +295,7 @@ const WorkerDashboard = () => {
                     ["Weight", `${mothers[selectedMother].weight} kg`],
                     ["BP", mothers[selectedMother].bp],
                     ["Hemoglobin", `${mothers[selectedMother].hemoglobin} g/dL`],
+                    ["Blood Group", mothers[selectedMother].bloodGroup || "Unknown"],
                     ["IFA Tablets", mothers[selectedMother].ifaTablets],
                     ["ANC Visits", `${mothers[selectedMother].ancVisits}/4`],
                     ["TT Vaccine", mothers[selectedMother].ttVaccine ? "Done" : "Pending"],
@@ -245,11 +307,11 @@ const WorkerDashboard = () => {
                   ].map(([label, val], i) => (
                     <div key={i}>
                       <p className="text-xs text-muted-foreground">{label}</p>
-                      <p className={`font-heading font-semibold ${
-                        label === "Hemoglobin" && Number(String(val).replace(" g/dL", "")) < 10 ? "text-destructive" :
-                        label === "TT Vaccine" && val === "Pending" ? "text-destructive" :
-                        label === "Transport" && val === "Not arranged" ? "text-accent" : "text-card-foreground"
-                      }`}>{val}</p>
+                      <p className={`font-heading font-semibold ${label === "Hemoglobin" && Number(String(val).replace(" g/dL", "")) < 10 ? "text-destructive" :
+                        label === "Blood Group" && String(val).endsWith("-") ? "text-destructive" :
+                          label === "TT Vaccine" && val === "Pending" ? "text-destructive" :
+                            label === "Transport" && val === "Not arranged" ? "text-accent" : "text-card-foreground"
+                        }`}>{val}</p>
                     </div>
                   ))}
                 </div>
@@ -262,9 +324,8 @@ const WorkerDashboard = () => {
           <div className="space-y-3 animate-slide-up">
             <h3 className="font-heading font-bold text-card-foreground">Notifications & Alerts</h3>
             {notifications.map((n) => (
-              <div key={n.id} className={`bg-card rounded-xl p-4 shadow-card border-l-4 ${
-                n.type === "urgent" ? "border-destructive" : n.type === "warning" ? "border-accent" : "border-secondary"
-              }`}>
+              <div key={n.id} className={`bg-card rounded-xl p-4 shadow-card border-l-4 ${n.type === "urgent" ? "border-destructive" : n.type === "warning" ? "border-accent" : "border-secondary"
+                }`}>
                 <p className="text-sm text-card-foreground">{n.message}</p>
                 <p className="text-xs text-muted-foreground mt-1">{n.timestamp.toLocaleString()}</p>
               </div>

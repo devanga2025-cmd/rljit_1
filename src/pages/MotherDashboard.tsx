@@ -9,7 +9,7 @@ import {
   Baby, Calendar, AlertTriangle, Heart, Droplets, Apple,
   Shield, Phone, Users, ChevronRight, CheckCircle2, Circle, Pill,
   Plus, Scale, TrendingUp, UserPlus, Send, Download, Film, Dumbbell, Star,
-  Stethoscope, HelpCircle, BookOpen, FileText, X, FileCheck, ClipboardList
+  Stethoscope, HelpCircle, BookOpen, FileText, X, FileCheck, ClipboardList, Sparkles, Activity, CheckSquare, Info
 } from "lucide-react";
 import { toast } from "sonner";
 import mcpCardImage from "@/assets/mcp-taayi-card.jpeg";
@@ -20,7 +20,8 @@ const MotherDashboard = () => {
   const { t } = useLanguage();
   const {
     mothers, updateMotherWeight, markIFATaken, reportSymptoms,
-    addFamilyMember, checkSchemeEligibility, addNotification, updateFatherDetails, updateHealthData
+    addFamilyMember, checkSchemeEligibility, addNotification, updateFatherDetails, updateHealthData,
+    updateDeliveryReadiness, updateSkinCare, updateMedicalHistory
   } = useApp();
   const mother = mothers[0];
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -74,6 +75,7 @@ const MotherDashboard = () => {
     { id: "danger", label: t("danger.signs"), icon: AlertTriangle },
     { id: "schemes", label: t("schemes"), icon: Shield },
     { id: "family", label: t("family.support"), icon: Users },
+    { id: "delivery_prep", label: "Delivery Prep", icon: Baby },
   ];
 
   const dangerSymptoms = [
@@ -586,6 +588,86 @@ const MotherDashboard = () => {
                 📋 MCP (Taayi) Card
               </h3>
               <p className="text-xs text-muted-foreground mb-3">Download your Mother & Child Protection Card and carry it to your Anganwadi or hospital visit.</p>
+
+              {/* Blood Group Section */}
+              <div className="bg-muted/30 rounded-xl p-4 mb-4 border border-border/50">
+                <h4 className="font-heading font-bold text-card-foreground mb-3 flex items-center gap-2 text-sm">
+                  <Droplets className="w-4 h-4 text-destructive" /> Mother's Blood Group
+                </h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-", "Unknown"].map((bg) => (
+                    <button
+                      key={bg}
+                      onClick={() => updateMedicalHistory(0, { bloodGroup: bg as any })}
+                      className={`py-1.5 rounded-lg text-xs font-heading font-bold transition-all ${mother.bloodGroup === bg
+                        ? "bg-primary text-primary-foreground shadow-sm scale-105"
+                        : "bg-card text-muted-foreground hover:bg-primary/10 border border-border"
+                        }`}
+                    >
+                      {bg}
+                    </button>
+                  ))}
+                </div>
+                {mother.bloodGroup && mother.bloodGroup.endsWith("-") && (
+                  <div className="mt-3 bg-destructive/10 border border-destructive/30 rounded-lg p-3 flex items-start gap-3">
+                    <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-xs text-destructive">Rh Negative Alert</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">
+                        Your blood group is Rh Negative. You may need an Anti-D injection during pregnancy.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Medical History Section */}
+              <div className="bg-muted/30 rounded-xl p-4 mb-4 border border-border/50">
+                <h4 className="font-heading font-bold text-card-foreground mb-3 flex items-center gap-2 text-sm">
+                  <Activity className="w-4 h-4 text-primary" /> Pre-Existing Conditions
+                </h4>
+                <div className="space-y-2">
+                  {[
+                    "High Blood Pressure", "Diabetes", "Thyroid Disorder", "Heart Disease",
+                    "Asthma", "Severe Anemia", "Epilepsy", "Previous C-Section", "Previous Miscarriage"
+                  ].map((condition) => (
+                    <label key={condition} className="flex items-center gap-3 p-2 rounded-lg cursor-pointer bg-card hover:bg-primary/5 transition-colors border border-border/50">
+                      <input
+                        type="checkbox"
+                        checked={mother.medicalHistory?.conditions?.includes(condition) || false}
+                        onChange={(e) => {
+                          const current = mother.medicalHistory?.conditions || [];
+                          const newConditions = e.target.checked
+                            ? [...current, condition]
+                            : current.filter(c => c !== condition);
+                          updateMedicalHistory(0, { medicalHistory: { ...mother.medicalHistory, conditions: newConditions, lastUpdated: new Date().toISOString().split("T")[0] } });
+                        }}
+                        className="w-4 h-4 accent-primary rounded"
+                      />
+                      <span className="font-medium text-xs text-card-foreground">{condition}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <div className="mt-3">
+                  <label className="text-[10px] font-semibold text-muted-foreground mb-1 block">Other Conditions</label>
+                  <textarea
+                    placeholder="Specify..."
+                    value={mother.medicalHistory?.otherCondition || ""}
+                    onChange={(e) => updateMedicalHistory(0, { medicalHistory: { ...mother.medicalHistory, otherCondition: e.target.value, lastUpdated: new Date().toISOString().split("T")[0] } })}
+                    className="w-full bg-card rounded-lg p-2 text-xs border border-border focus:ring-1 focus:ring-primary h-16 resize-none"
+                  />
+                </div>
+
+                {(mother.medicalHistory?.conditions?.length > 0 || mother.medicalHistory?.otherCondition) && (
+                  <div className="mt-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-2 flex items-center gap-2">
+                    <Info className="w-3 h-3 text-yellow-600" />
+                    <p className="text-[10px] text-yellow-800/80 leading-tight">
+                      Visible only to health workers.
+                    </p>
+                  </div>
+                )}
+              </div>
               <div className="rounded-xl overflow-hidden border border-border mb-3">
                 <img src={mcpCardImage} alt="MCP Taayi Card" className="w-full h-auto" />
               </div>
@@ -1237,35 +1319,35 @@ const MotherDashboard = () => {
             {[
               {
                 id: "pmmvy",
-                name: "PMMVY",
-                fullName: "Pradhan Mantri Matru Vandana Yojana",
+                name: "TN-HFW-MAT-001",
+                fullName: "Dr. Muthulakshmi Reddy Maternity Benefit Scheme",
                 icon: "💰",
-                benefit: "₹5,000",
-                summary: "Get ₹5,000 in 3 installments during pregnancy",
-                eligibility: ["First pregnancy", "Age 19+", "Registered at Anganwadi", "Completed first ANC visit"],
-                installments: 3,
+                benefit: "₹18,000",
+                summary: "Get ₹18,000  during pregnancy",
+                eligibility: ["Provides up to ₹18,000 financial assistance to pregnant and lactating women, including cash incentives and nutritional kits to promote maternal and child health. "],
+                installments: 7,
                 current: mother.schemeStatus.pmmvy === "Active" || mother.schemeStatus.pmmvy === "2nd Installment" ? 2 : mother.schemeStatus.pmmvy === "1st Installment" ? 1 : 0,
                 status: mother.schemeStatus.pmmvy,
               },
               {
                 id: "jsy",
-                name: "JSY",
-                fullName: "Janani Suraksha Yojana",
+                name: "PMMVY",
+                fullName: "Pradhan Mantri Matru Vandana Yojana (PMMVY) – Tamil Nadu implementation",
                 icon: "🏥",
-                benefit: "₹1,400",
-                summary: "Get ₹1,400 for delivery at hospital",
-                eligibility: ["Institutional delivery", "Age 19+", "Below poverty line (BPL)"],
+                benefit: "₹5,000",
+                summary: "Get ₹5,000 for delivery at hospital",
+                eligibility: ["Benefit: Central maternity benefit providing ₹5,000 for the first live birth and ₹6,000 for the second (if girl) to pregnant and lactating mothers to support maternal health and nutrition."],
                 installments: 1,
                 current: mother.schemeStatus.jsy === "Eligible" ? 1 : 0,
                 status: mother.schemeStatus.jsy,
               },
               {
                 id: "jssk",
-                name: "JSSK",
-                fullName: "Janani Shishu Suraksha Karyakram",
+                name: "TN-HFW-DIG-003",
+                fullName: "Thaimai App & Maternal Health Monitoring Scheme",
                 icon: "🚑",
                 benefit: "Free Services",
-                summary: "Free delivery, transport, and medicines at government hospitals",
+                summary: " A digital health initiative to track high-risk pregnancies, antenatal visits, immunisations, and deliver timely health reminders and baby care support in Tamil Nadu",
                 eligibility: ["All pregnant women", "Delivery at government hospital"],
                 installments: 0,
                 current: 0,
@@ -1553,6 +1635,158 @@ const MotherDashboard = () => {
             </div>
           </div>
         )}
+        {activeTab === "delivery_prep" && (
+          <div className="space-y-6 animate-slide-up">
+            {/* Header */}
+            <div className="bg-card rounded-2xl p-5 shadow-card border-2 border-primary/20">
+              <h2 className="font-heading font-bold text-xl text-card-foreground mb-2 flex items-center gap-2">
+                <Activity className="w-6 h-6 text-primary" /> Healthy Practices for Normal Delivery
+              </h2>
+              <p className="text-sm text-muted-foreground">Follow these daily habits to prepare your body for a natural birth.</p>
+            </div>
+
+            {/* Readiness Score */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-heading font-bold text-card-foreground">Normal Delivery Readiness</h3>
+                <span className="text-2xl font-bold text-primary">{Math.round((mother.deliveryReadiness?.checklist?.length || 0) / 8 * 100)}%</span>
+              </div>
+              <div className="w-full bg-muted rounded-full h-4">
+                <div className="gradient-mother h-4 rounded-full transition-all duration-1000" style={{ width: `${((mother.deliveryReadiness?.checklist?.length || 0) / 8) * 100}%` }} />
+              </div>
+            </div>
+
+            {/* Daily Checklist */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <h3 className="font-heading font-bold text-card-foreground mb-4">Daily Healthy Practices</h3>
+              {[
+                "Attend all ANC visits", "Take IFA & calcium daily", "Maintain balanced diet",
+                "Drink 8–10 glasses of water", "Do doctor-approved walking", "Practice breathing exercises",
+                "Sleep 7–8 hours", "Monitor BP & Hb levels"
+              ].map((item) => (
+                <label key={item} className="flex items-center gap-3 py-3 border-b border-border last:border-0 cursor-pointer">
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${(mother.deliveryReadiness?.checklist || []).includes(item) ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground"
+                    }`}>
+                    {(mother.deliveryReadiness?.checklist || []).includes(item) && <CheckSquare className="w-4 h-4" />}
+                  </div>
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    checked={(mother.deliveryReadiness?.checklist || []).includes(item)}
+                    onChange={(e) => {
+                      const current = mother.deliveryReadiness?.checklist || [];
+                      const newChecklist = e.target.checked
+                        ? [...current, item]
+                        : current.filter(i => i !== item);
+                      updateDeliveryReadiness(0, { checklist: newChecklist });
+                    }}
+                  />
+                  <span className={(mother.deliveryReadiness?.checklist || []).includes(item) ? "text-primary font-semibold" : "text-card-foreground"}>{item}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Physical Preparation Guidance */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <h3 className="font-heading font-bold text-card-foreground mb-4">Physical Preparation</h3>
+              <div className="space-y-3">
+                {[
+                  { title: "Regular Walking", desc: "20–30 minutes daily. Improves stamina & helps labor progress.", icon: "🚶‍♀️" },
+                  { title: "Pelvic Floor Exercises (Kegels)", desc: "Strengthens muscles. Supports easier pushing.", icon: "💪" },
+                  { title: "Squatting Practice", desc: "Helps baby move into correct position. (Only if safe)", icon: "🧘‍♀️" }
+                ].map((ex) => (
+                  <div key={ex.title} className="bg-muted rounded-xl p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">{ex.icon}</span>
+                      <div>
+                        <h4 className="font-heading font-bold text-card-foreground">{ex.title}</h4>
+                        <p className="text-sm text-muted-foreground mt-1">{ex.desc}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const current = mother.deliveryReadiness?.practiced || [];
+                        if (!current.includes(ex.title)) {
+                          updateDeliveryReadiness(0, { practiced: [...current, ex.title] });
+                          toast.success("Good job! Marked as practiced today.");
+                        }
+                      }}
+                      className={`w-full mt-3 py-2 rounded-lg font-heading font-bold text-xs transition-colors ${(mother.deliveryReadiness?.practiced || []).includes(ex.title)
+                        ? "bg-green-500 text-white cursor-default"
+                        : "bg-white text-primary border border-primary hover:bg-primary/5"
+                        }`}
+                    >
+                      {(mother.deliveryReadiness?.practiced || []).includes(ex.title) ? "✅ Practiced Today" : "Mark as Practiced Today"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Mental Preparation */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <h3 className="font-heading font-bold text-card-foreground mb-4">Mental Preparation</h3>
+              <div className="bg-primary/5 rounded-xl p-4 mb-4">
+                <p className="text-sm font-heading font-semibold text-primary mb-2">🧘‍♀️ Stress Level Tracker</p>
+                <input
+                  type="range" min="1" max="10"
+                  value={mother.deliveryReadiness?.stressLevel || 5}
+                  onChange={(e) => updateDeliveryReadiness(0, { stressLevel: parseInt(e.target.value) })}
+                  className="w-full accent-primary h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>Relaxed (1)</span>
+                  <span>Stressed (10)</span>
+                </div>
+                <p className="text-center text-sm font-bold text-primary mt-2">Current Level: {mother.deliveryReadiness?.stressLevel || 5}/10</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted p-3 rounded-lg text-center">
+                  <span className="text-2xl block mb-1">🌬️</span>
+                  <p className="text-xs font-bold text-card-foreground">Breathing</p>
+                  <p className="text-[10px] text-muted-foreground">Practice deep belly breathing</p>
+                </div>
+                <div className="bg-muted p-3 rounded-lg text-center">
+                  <span className="text-2xl block mb-1">💖</span>
+                  <p className="text-xs font-bold text-card-foreground">Affirmations</p>
+                  <p className="text-[10px] text-muted-foreground">"My body knows how to birth"</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Myths vs Facts */}
+            <div className="bg-card rounded-2xl p-5 shadow-card">
+              <h3 className="font-heading font-bold text-card-foreground mb-4">Common Myths vs Facts</h3>
+              <div className="space-y-3">
+                <div className="bg-red-100/50 p-3 rounded-lg border border-red-100">
+                  <p className="text-xs font-bold text-red-600">❌ Myth: Spicy food causes labor</p>
+                  <p className="text-xs text-green-700 mt-1">✔ Fact: Labor starts naturally when baby is ready.</p>
+                </div>
+                <div className="bg-red-100/50 p-3 rounded-lg border border-red-100">
+                  <p className="text-xs font-bold text-red-600">❌ Myth: Walking causes miscarriage</p>
+                  <p className="text-xs text-green-700 mt-1">✔ Fact: Light walking is healthy in normal pregnancy.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Medical Note */}
+            <div className="bg-accent/10 rounded-2xl p-5 border border-accent/20">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-accent mt-0.5" />
+                <div>
+                  <h4 className="font-heading font-bold text-card-foreground text-sm">Important Medical Note</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Normal delivery is safe in most healthy pregnancies. Always follow doctor advice.
+                    C-section is life-saving when medically necessary.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+
+
       </main>
 
       <EmergencyButton />

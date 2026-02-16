@@ -40,6 +40,25 @@ interface MotherData {
   transportReady: boolean;
   hospitalBagReady: boolean;
   hospitalBagItems: { [key: string]: boolean };
+  deliveryReadiness: {
+    checklist: string[];
+    score: number;
+    practiced: string[];
+    stressLevel: number;
+  };
+  skinCare: {
+    dailyChecklist: string[];
+    streak: number;
+    lastLogDate: string;
+  };
+  medicalHistory: {
+    conditions: string[];
+    otherCondition: string;
+    lastUpdated: string;
+  };
+  bloodGroup: "A+" | "A-" | "B+" | "B-" | "O+" | "O-" | "AB+" | "AB-" | "Unknown";
+  gmail?: string;
+  password?: string;
   status: "pending" | "active";
 }
 
@@ -92,9 +111,16 @@ interface AppContextType {
   updateHospitalBag: (motherIndex: number, item: string, checked: boolean) => void;
   updateFatherDetails: (motherIndex: number, fatherName: string, fatherPhone: string) => void;
   updateHealthData: (motherIndex: number, data: { bp?: string; hemoglobin?: number; ttVaccine?: boolean; ancVisits?: number }) => void;
+  updateDeliveryReadiness: (motherIndex: number, data: Partial<MotherData['deliveryReadiness']>) => void;
+  updateSkinCare: (motherIndex: number, data: Partial<MotherData['skinCare']>) => void;
+  updateMedicalHistory: (motherIndex: number, data: Partial<Pick<MotherData, "bloodGroup" | "medicalHistory">>) => void;
   chatMessages: ChatMessage[];
   sendChatMessage: (msg: Omit<ChatMessage, "id" | "timestamp">) => void;
-  registerMother: (data: Partial<MotherData>) => void;
+  registerMother: (data: Partial<MotherData>) => Promise<any>;
+  registerFather: (data: any) => Promise<any>;
+  registerHealthWorker: (data: any) => Promise<any>;
+  loginUser: (email: string, password: string) => Promise<any>;
+  fetchMothers: () => Promise<void>;
   generateReport: () => { total: number; highRisk: number; overdueANC: number; verified: number; homeVisits: number; pending: number };
 }
 
@@ -114,6 +140,10 @@ const sampleMothers: MotherData[] = [
     birthPreparedness: { "Hospital identified": true, "Transport arranged": false, "Money saved": true },
     transportReady: false, hospitalBagReady: false,
     hospitalBagItems: { "Clothes for baby": false, "Sanitary pads": false, "Documents": true, "Money": true, "Emergency numbers": true },
+    deliveryReadiness: { checklist: [], score: 0, practiced: [], stressLevel: 3 },
+    skinCare: { dailyChecklist: [], streak: 0, lastLogDate: "" },
+    bloodGroup: "O+",
+    medicalHistory: { conditions: [], otherCondition: "", lastUpdated: "" },
     status: "active"
   },
   {
@@ -131,6 +161,10 @@ const sampleMothers: MotherData[] = [
     birthPreparedness: { "Hospital identified": true, "Transport arranged": false },
     transportReady: false, hospitalBagReady: false,
     hospitalBagItems: {},
+    deliveryReadiness: { checklist: [], score: 0, practiced: [], stressLevel: 5 },
+    skinCare: { dailyChecklist: [], streak: 0, lastLogDate: "" },
+    bloodGroup: "B-",
+    medicalHistory: { conditions: ["High Blood Pressure"], otherCondition: "", lastUpdated: "2026-01-10" },
     status: "active"
   },
   {
@@ -148,6 +182,10 @@ const sampleMothers: MotherData[] = [
     birthPreparedness: {},
     transportReady: false, hospitalBagReady: false,
     hospitalBagItems: {},
+    deliveryReadiness: { checklist: [], score: 0, practiced: [], stressLevel: 2 },
+    skinCare: { dailyChecklist: [], streak: 0, lastLogDate: "" },
+    bloodGroup: "Unknown",
+    medicalHistory: { conditions: [], otherCondition: "", lastUpdated: "" },
     status: "pending"
   },
 ];
@@ -370,63 +408,237 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, []);
 
+  const updateDeliveryReadiness = useCallback((motherIndex: number, data: Partial<MotherData['deliveryReadiness']>) => {
+    setMothers(prev => prev.map((m, i) => {
+      if (i !== motherIndex) return m;
+      return { ...m, deliveryReadiness: { ...m.deliveryReadiness, ...data } };
+    }));
+  }, []);
+
+  const updateSkinCare = useCallback((motherIndex: number, data: Partial<MotherData['skinCare']>) => {
+    setMothers(prev => prev.map((m, i) => {
+      if (i !== motherIndex) return m;
+      return { ...m, skinCare: { ...m.skinCare, ...data } };
+    }));
+  }, []);
+
+  const updateMedicalHistory = useCallback((motherIndex: number, data: Partial<Pick<MotherData, "bloodGroup" | "medicalHistory">>) => {
+    setMothers(prev => prev.map((m, i) => {
+      if (i !== motherIndex) return m;
+
+      const updatedMother = { ...m, ...data };
+
+      // Logic: Check for Rh Negative
+      if (data.bloodGroup && ["A-", "B-", "O-", "AB-"].includes(data.bloodGroup)) {
+        toast.warning("⚠️ Rh Negative Blood Group - Requires doctor monitoring for Anti-D injection.");
+        addNotification({
+          message: `🩸 Medical Alert: ${m.name} has Rh Negative blood group (${data.bloodGroup}). Check Anti-D status.`,
+          type: "urgent",
+          targetRole: "worker"
+        });
+      }
+
+      // Logic: Risk Scoring based on conditions
+      if (data.medicalHistory && data.medicalHistory.conditions.length > 0) {
+        const highRiskConditions = ["High Blood Pressure", "Diabetes", "Heart Disease", "Epilepsy", "Severe Anemia"];
+        const isHighRisk = data.medicalHistory.conditions.some(c => highRiskConditions.includes(c));
+
+        if (isHighRisk && m.riskLevel !== "high") {
+          updatedMother.riskLevel = "high";
+          toast.error("⚠️ Risk level updated to HIGH due to medical history.");
+          addNotification({
+            message: `🔴 High Risk Alert: ${m.name} marked high risk due to ${data.medicalHistory.conditions.join(", ")}`,
+            type: "urgent",
+            targetRole: "worker"
+          });
+        }
+      }
+
+      return updatedMother;
+    }));
+  }, [addNotification]);
+
   const sendChatMessage = useCallback((msg: Omit<ChatMessage, "id" | "timestamp">) => {
     const newMsg = { ...msg, id: Date.now().toString(), timestamp: new Date() };
     setChatMessages(prev => [...prev, newMsg]);
     toast.success("Message sent to health worker");
   }, []);
 
-  const registerMother = useCallback((data: Partial<MotherData>) => {
-    const lmp = data.lmpDate ? new Date(data.lmpDate) : new Date();
-    const today = new Date();
-    const diffWeeks = Math.floor((today.getTime() - lmp.getTime()) / (7 * 24 * 60 * 60 * 1000));
-    const dueDate = new Date(lmp.getTime() + 280 * 24 * 60 * 60 * 1000);
+  /* ================= INTEGRATION: LOGIN ================= */
+  const loginUser = useCallback(async (email: string, password: string) => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Login failed");
 
-    const newMother: MotherData = {
-      id: `m${Date.now()}`,
-      name: data.name || "",
-      age: data.age || 25,
-      village: data.village || "",
-      location: data.location || "",
-      phone: data.phone || "",
-      pregnancyWeek: Math.min(diffWeeks, 42),
-      dueDate: dueDate.toISOString().split("T")[0],
-      lmpDate: data.lmpDate || "",
-      riskLevel: "low",
-      nextANC: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-      weight: 55,
-      weightHistory: [],
-      bp: "120/80",
-      hemoglobin: 11,
-      ifaTablets: 0,
-      ifaMissedDays: 0,
-      ttVaccine: false,
-      ancVisits: 0,
-      waterIntake: 0,
-      foodChecklist: [],
-      dangerSigns: [],
-      schemeStatus: { pmmvy: "Not Applied", jsy: "Pending", nutrition: "Pending" },
-      schemeEligibility: { pmmvy: false, jsy: false, nutrition: false },
-      fatherName: "",
-      emergencyContact: data.phone || "",
-      verified: false,
-      mcpNumber: "",
-      familyMembers: [],
-      birthPreparedness: {},
-      transportReady: false,
-      hospitalBagReady: false,
-      hospitalBagItems: {},
-      status: "pending"
-    };
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("userRole", result.role);
+      toast.success("Login successful!");
+      return result;
+    } catch (error: any) {
+      toast.error(error.message || "Connection error");
+      throw error;
+    }
+  }, []);
 
-    setMothers(prev => [...prev, newMother]);
-    addNotification({
-      message: `New mother registered: ${newMother.name} (${newMother.village})`,
-      type: "info",
-      targetRole: "worker"
-    });
-    toast.success(`Welcome ${newMother.name}! Your pregnancy dashboard is ready.`);
-  }, [addNotification]);
+  /* ================= INTEGRATION: REGISTER MOTHER ================= */
+  const registerMother = useCallback(async (data: Partial<MotherData>) => {
+    try {
+      console.log("Attempting to register mother:", data);
+      const apiUrl = "http://127.0.0.1:5000/api/register/mother";
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: data.name,
+          age: data.age,
+          phone_number: data.phone,
+          village: data.village,
+          location: data.location,
+          blood_group: data.bloodGroup || "Unknown",
+          pre_existing_conditions: data.medicalHistory ? JSON.stringify(data.medicalHistory) : null,
+          email: data.gmail,
+          password: data.password
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Registration failed");
+
+      toast.success("Mother registered successfully!");
+      return result;
+    } catch (error: any) {
+      console.error("Registration Error:", error);
+      toast.error(error.message || "Failed to fetch. Server might be down.");
+      throw error;
+    }
+  }, []);
+
+  /* ================= INTEGRATION: REGISTER FATHER ================= */
+  const registerFather = useCallback(async (data: any) => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/register/father", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          father_name: data.fatherName,
+          wife_name: data.wifeName,
+          wife_age: data.wifeAge,
+          location: data.location,
+          email: data.gmail,
+          password: data.password
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Registration failed");
+      toast.success("Father registered successfully!");
+      return result;
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch. Server might be down.");
+      throw error;
+    }
+  }, []);
+
+  /* ================= INTEGRATION: REGISTER WORKER ================= */
+  const registerHealthWorker = useCallback(async (data: any) => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/register/healthworker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: data.name,
+          anganwadi_location: data.anganwadiLocation,
+          email: data.gmail,
+          password: data.password
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Registration failed");
+      toast.success("Health Worker registered successfully!");
+      return result;
+    } catch (error: any) {
+      toast.error(error.message || "Failed to fetch. Server might be down.");
+      throw error;
+    }
+  }, []);
+
+  const fetchMothers = useCallback(async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5000/api/mothers");
+      if (!response.ok) throw new Error("Failed to fetch mothers");
+      const data = await response.json();
+
+      // Map backend data to frontend MotherData structure
+      const mappedMothers: MotherData[] = data.map((m: any) => {
+        let pregnancyWeek = 28;
+        let dueDate = "2026-05-15";
+
+        if (m.lmp_date) {
+          const lmp = new Date(m.lmp_date);
+          const now = new Date();
+          const diffTime = Math.abs(now.getTime() - lmp.getTime());
+          pregnancyWeek = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+
+          const edd = new Date(lmp.getTime());
+          edd.setDate(edd.getDate() + 280); // 280 days = 40 weeks
+          dueDate = edd.toISOString().split("T")[0];
+        }
+
+        return {
+          id: m.id.toString(),
+          name: m.full_name,
+          age: m.age,
+          village: m.village,
+          location: m.location,
+          phone: m.phone_number,
+          pregnancyWeek,
+          dueDate,
+          lmpDate: m.lmp_date || "2025-08-15",
+          riskLevel: m.blood_group?.endsWith("-") ? "high" : "low",
+          nextANC: "2026-02-20",
+          weight: 60,
+          weightHistory: [],
+          bp: "120/80",
+          hemoglobin: 12,
+          ifaTablets: 90,
+          ifaMissedDays: 0,
+          ttVaccine: true,
+          ancVisits: 2,
+          waterIntake: 8,
+          foodChecklist: [],
+          dangerSigns: [],
+          schemeStatus: { pmmvy: "Pending", jsy: "Eligible", nutrition: "Active" },
+          schemeEligibility: { pmmvy: true, jsy: true, nutrition: true },
+          fatherName: "N/A",
+          emergencyContact: m.phone_number,
+          verified: false,
+          mcpNumber: "",
+          familyMembers: [],
+          birthPreparedness: {},
+          transportReady: false,
+          hospitalBagReady: false,
+          hospitalBagItems: {},
+          deliveryReadiness: { checklist: [], score: 0, practiced: [], stressLevel: 3 },
+          skinCare: { dailyChecklist: [], streak: 0, lastLogDate: "" },
+          bloodGroup: m.blood_group as MotherData["bloodGroup"],
+          medicalHistory: m.pre_existing_conditions ? JSON.parse(m.pre_existing_conditions) : { conditions: [], otherCondition: "", lastUpdated: "" },
+          status: "active",
+          gmail: m.email
+        };
+      });
+
+      setMothers(mappedMothers);
+    } catch (error) {
+      console.error("Error fetching mothers:", error);
+      toast.error("Failed to load mothers list from server");
+    }
+  }, []);
 
   const generateReport = useCallback(() => {
     return {
@@ -445,8 +657,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       visits, addVisit, fatherTasks, toggleFatherTask,
       updateMotherWeight, markIFATaken, reportSymptoms, addFamilyMember,
       checkSchemeEligibility, verifyMother, markHighRisk, sendReminder,
-      confirmTransport, updateHospitalBag, updateFatherDetails, updateHealthData, chatMessages, sendChatMessage,
-      registerMother, generateReport
+      confirmTransport, updateHospitalBag, updateFatherDetails, updateHealthData, updateDeliveryReadiness, updateSkinCare, updateMedicalHistory, chatMessages, sendChatMessage,
+      registerMother, registerFather, registerHealthWorker, loginUser, fetchMothers, generateReport
     }}>
       {children}
     </AppContext.Provider>

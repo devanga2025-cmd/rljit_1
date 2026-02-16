@@ -23,7 +23,7 @@ const Index = () => {
       <div className="absolute inset-0 opacity-10">
         <img src={heroImage} alt="" className="w-full h-full object-cover" />
       </div>
-      
+
       {/* Decorative blobs */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-secondary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -32,7 +32,7 @@ const Index = () => {
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-4 sm:px-8">
           <div className="flex items-center gap-2">
-            <img src={appLogo} alt="Care4Mom" className="w-9 h-9 rounded-full object-cover shadow-md" />
+            <img src={appLogo} alt="JananiSetu" className="w-9 h-9 rounded-full object-cover shadow-md" />
             <span className="font-heading font-bold text-lg text-foreground">{t("app.title")}</span>
           </div>
           <LanguageToggle />
@@ -75,7 +75,7 @@ const Index = () => {
         {/* Footer */}
         <footer className="text-center py-4 px-4">
           <p className="text-xs text-muted-foreground font-body">
-            © 2026 Care4Mom & Baby · Safe Motherhood Initiative
+            © 2026 JananiSetu & Baby · Safe Motherhood Initiative
           </p>
         </footer>
       </div>

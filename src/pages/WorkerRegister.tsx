@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useApp } from "@/contexts/AppContext";
 import LanguageToggle from "@/components/LanguageToggle";
 import EmergencyButton from "@/components/EmergencyButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Building2, ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const WorkerRegister = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { registerHealthWorker, loginUser } = useApp();
   const [isLogin, setIsLogin] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -25,13 +28,22 @@ const WorkerRegister = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLogin) {
-      localStorage.setItem("workerName", form.name);
-      localStorage.setItem("workerId", form.workerId);
+    try {
+      if (isLogin) {
+        await loginUser(form.gmail, form.password);
+        localStorage.setItem("userRole", "worker");
+        navigate("/worker");
+      } else {
+        await registerHealthWorker(form);
+        localStorage.setItem("workerName", form.name);
+        setIsLogin(true);
+        toast.info("Registration successful! Please login.");
+      }
+    } catch (err: any) {
+      console.error(err);
     }
-    navigate("/worker");
   };
 
   return (
@@ -74,7 +86,7 @@ const WorkerRegister = () => {
               {isLogin && (
                 <div className="space-y-2">
                   <Label htmlFor="loginWorkerId" className="font-heading font-semibold">Worker ID Number</Label>
-                  <Input id="loginWorkerId" placeholder="Enter your Worker ID" value={form.workerId} onChange={(e) => handleChange("workerId", e.target.value)} required />
+                  <Input id="loginWorkerId" placeholder="Enter your Worker ID" value={form.workerId} onChange={(e) => handleChange("workerId", e.target.value)} />
                 </div>
               )}
               <div className="space-y-2">

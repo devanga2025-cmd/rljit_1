@@ -23,7 +23,7 @@ const DashboardHeader = ({ title, gradient }: DashboardHeaderProps) => {
           <button onClick={() => navigate("/")} className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <img src={appLogo} alt="Care4Mom" className="w-8 h-8 rounded-full object-cover border-2 border-primary-foreground/30" />
+          <img src={appLogo} alt="JananiSetu" className="w-8 h-8 rounded-full object-cover border-2 border-primary-foreground/30" />
           <h1 className="text-xl sm:text-2xl font-heading font-bold text-primary-foreground">{title}</h1>
         </div>
         <div className="flex items-center gap-3">

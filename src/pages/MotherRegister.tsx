@@ -15,7 +15,7 @@ import { toast } from "sonner";
 const MotherRegister = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { registerMother } = useApp();
+  const { registerMother, loginUser } = useApp();
   const [isLogin, setIsLogin] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -49,50 +49,58 @@ const MotherRegister = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Check consent before proceeding
-    const consent = localStorage.getItem("privacyConsent_mother");
-    if (!consent) {
-      setPendingFormData(e);
-      setFormSubmitted(true);
-      setShowConsentDialog(true);
-      return;
-    }
-
-    proceedWithRegistration(e);
+    setPendingFormData(e);
+    setFormSubmitted(true);
+    setShowConsentDialog(true);
   };
 
-  const proceedWithRegistration = (e?: React.FormEvent) => {
+  const proceedWithRegistration = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!isLogin) {
-      if (!form.lmpDate) {
-        toast.error("Please enter your Last Menstrual Period (LMP) date");
-        return;
+    try {
+      if (isLogin) {
+        await loginUser(form.gmail, form.password);
+        localStorage.setItem("userRole", "mother");
+        navigate("/mother");
+      } else {
+        if (!form.lmpDate) {
+          toast.error("Please enter your Last Menstrual Period (LMP) date");
+          return;
+        }
+        if (parseInt(form.age) < 20 || parseInt(form.age) > 40) {
+          toast.error("Age must be between 20 and 40");
+          return;
+        }
+        if (form.phone.length !== 10) {
+          toast.error("Phone number must be exactly 10 digits");
+          return;
+        }
+
+        await registerMother({
+          name: form.name,
+          age: parseInt(form.age),
+          village: form.village,
+          location: form.location,
+          phone: form.phone,
+          lmpDate: form.lmpDate,
+          gmail: form.gmail,
+          password: form.password
+        });
+
+        localStorage.setItem("motherName", form.name);
+        setIsLogin(true); // Switch to login after successful register
+        toast.info("Please login with your new account");
       }
-      if (parseInt(form.age) < 20 || parseInt(form.age) > 30) {
-        toast.error("Age must be between 20 and 30");
-        return;
-      }
-      if (form.phone.length !== 10) {
-        toast.error("Phone number must be exactly 10 digits");
-        return;
-      }
-      registerMother({
-        name: form.name,
-        age: parseInt(form.age),
-        village: form.village,
-        location: form.location,
-        phone: form.phone,
-        lmpDate: form.lmpDate,
-      });
-      localStorage.setItem("motherName", form.name);
+    } catch (err: any) {
+      console.error(err);
     }
-    navigate("/mother");
   };
 
   const handleConsentAccept = () => {
     setShowConsentDialog(false);
+    // Mark as accepted for this session
+    sessionStorage.setItem("privacyConsent_mother_session", "true");
+
     if (formSubmitted && pendingFormData) {
       proceedWithRegistration();
       setFormSubmitted(false);
@@ -104,7 +112,7 @@ const MotherRegister = () => {
     setShowConsentDialog(false);
     setFormSubmitted(false);
     setPendingFormData(null);
-    toast.error("Registration cancelled. Consent is required to proceed.");
+    toast.error("Action cancelled. Consent is required to proceed.");
   };
 
   return (
@@ -146,8 +154,8 @@ const MotherRegister = () => {
                         if (val === "" || /^\d+$/.test(val)) {
                           handleChange("age", val);
                         }
-                      }} required min={20} max={30} />
-                      <p className="text-xs text-muted-foreground">Age must be between 20-30</p>
+                      }} required min={20} max={40} />
+                      <p className="text-xs text-muted-foreground">Age must be between 20-40</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone" className="font-heading font-semibold">Phone Number</Label>

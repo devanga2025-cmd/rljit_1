@@ -21,13 +21,12 @@ const PrivacyConsentDialog = ({ open, onAccept, onCancel, userType }: PrivacyCon
   const navigate = useNavigate();
 
   const handleAccept = () => {
-    // Save consent timestamp to localStorage
     const consentData = {
       timestamp: new Date().toISOString(),
       userType,
       accepted: true,
     };
-    localStorage.setItem(`privacyConsent_${userType}`, JSON.stringify(consentData));
+    sessionStorage.setItem(`privacyConsent_${userType}_session`, "true");
     onAccept();
   };
 
@@ -37,85 +36,72 @@ const PrivacyConsentDialog = ({ open, onAccept, onCancel, userType }: PrivacyCon
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-primary/20 shadow-hero">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-heading font-bold text-card-foreground flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary" />
-            Your Privacy & Safety Matter
+          <DialogTitle className="text-2xl font-heading font-bold text-foreground flex items-center gap-2">
+            <Shield className="w-8 h-8 text-primary" />
+            JananiSetu – Data Protection & Privacy Notice
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
-            <p className="text-sm font-heading font-semibold text-card-foreground mb-3">
-              We respect your privacy.
+        <div className="space-y-6 py-4">
+          <div className="space-y-4">
+            <p className="text-lg font-heading font-bold text-card-foreground">
+              Your data is secure with JananiSetu.
             </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                Your health information will be securely stored.
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              We are committed to protecting your personal and medical information with the highest level of confidentiality.
+            </p>
+          </div>
+
+          <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10 space-y-4">
+            <ul className="space-y-4 text-sm text-muted-foreground">
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-foreground font-medium">Your data will NOT be shared with unauthorized users.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                Your data will only be visible to you and your assigned Anganwadi / Health Worker.
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-foreground font-medium">Your information is visible only to you and your assigned health worker.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                Your information will NOT be shared, sold, or misused.
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-foreground font-medium">We do NOT sell, misuse, or distribute your data.</span>
               </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                All data is used only to improve maternal and child health care support.
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-foreground font-medium">All login sessions are secured using encrypted authentication.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                <span className="text-foreground font-medium">Your medical history remains confidential and protected.</span>
               </li>
             </ul>
           </div>
 
-          <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20">
-            <div className="flex items-start gap-2 mb-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
-              <p className="text-sm font-heading font-semibold text-card-foreground">Important:</p>
-            </div>
-            <p className="text-sm text-muted-foreground ml-7">
-              In case of emergency risk (such as danger signs), your assigned health worker may be notified to provide timely support.
-            </p>
-          </div>
-
-          <div className="bg-muted rounded-lg p-3">
-            <p className="text-xs text-muted-foreground">
-              You can withdraw consent or delete your account anytime.
-            </p>
-            <p className="text-xs text-muted-foreground mt-2 font-semibold">
-              By continuing, you agree to our Privacy & Data Protection Policy.
+          <div className="bg-muted/50 rounded-xl p-4 border border-border">
+            <p className="text-xs text-muted-foreground text-center font-medium italic">
+              By continuing, you confirm that you understand and agree to our data protection policy.
             </p>
           </div>
         </div>
 
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+        <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={onCancel}
-            className="w-full sm:w-auto order-3 sm:order-1"
+            className="w-full sm:w-auto order-2 sm:order-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all rounded-xl py-6"
           >
-            Cancel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleViewPolicy}
-            className="w-full sm:w-auto order-2 flex items-center gap-2"
-          >
-            <FileText className="w-4 h-4" />
-            View Full Privacy Policy
+            ❌ Cancel
           </Button>
           <Button
             onClick={handleAccept}
-            className={`w-full sm:w-auto order-1 sm:order-3 ${
-              userType === "mother"
-                ? "gradient-mother text-primary-foreground"
-                : "gradient-father text-primary-foreground"
-            }`}
+            className={`w-full sm:flex-1 order-1 sm:order-2 font-heading font-bold text-lg py-6 rounded-xl shadow-hero hover:scale-[1.02] transition-transform ${userType === "mother"
+              ? "gradient-mother text-primary-foreground"
+              : "gradient-father text-primary-foreground"
+              }`}
           >
-            <CheckCircle2 className="w-4 h-4 mr-2" />
-            I Agree & Continue
+            ✅ I Agree & Continue
           </Button>
         </DialogFooter>
       </DialogContent>

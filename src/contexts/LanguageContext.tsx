@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from "react";
 type Lang = "en" | "kn" | "hi";
 
 const translations: Record<string, Record<Lang, string>> = {
-  "app.title": { en: "Care4Mom & Baby", kn: "ಕೇರ್4ಮಾಮ್ & ಬೇಬಿ", hi: "केयर4मॉम एंड बेबी" },
+  "app.title": { en: "JananiSetu", kn: "ಜನನಿ ಸೇತು", hi: "जननी सेतु" },
   "app.tagline": { en: "Digital Pregnancy & Family Support System for Safe Motherhood", kn: "ಸುರಕ್ಷಿತ ಮಾತೃತ್ವಕ್ಕಾಗಿ ಡಿಜಿಟಲ್ ಗರ್ಭಧಾರಣೆ ಮತ್ತು ಕುಟುಂಬ ಬೆಂಬಲ ವ್ಯವಸ್ಥೆ", hi: "सुरक्षित मातृत्व के लिए डिजिटल गर्भावस्था और पारिवारिक सहायता प्रणाली" },
   "role.select": { en: "Select Your Role", kn: "ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ", hi: "अपनी भूमिका चुनें" },
   "role.mother": { en: "Mother Login / Register", kn: "ತಾಯಿ ಲಾಗಿನ್ / ನೋಂದಣಿ", hi: "माँ लॉगिन / रजिस्टर" },
@@ -42,7 +42,7 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType>({
   lang: "en",
-  setLang: () => {},
+  setLang: () => { },
   t: (key) => key,
 });
 

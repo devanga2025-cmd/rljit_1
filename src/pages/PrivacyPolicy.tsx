@@ -31,7 +31,7 @@ const PrivacyPolicy = () => {
               Privacy & Data Protection Policy
             </CardTitle>
             <p className="text-sm text-muted-foreground font-body">
-              Care4Mom & Baby Platform
+              JananiSetu Platform
             </p>
           </CardHeader>
 
@@ -42,7 +42,7 @@ const PrivacyPolicy = () => {
                 Introduction
               </h2>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                At Care4Mom & Baby, we are committed to protecting your privacy and ensuring the security of your personal health information. This Privacy Policy explains how we collect, use, store, and protect your data when you use our platform.
+                At JananiSetu, we are committed to protecting your privacy and ensuring the security of your personal health information. This Privacy Policy explains how we collect, use, store, and protect your data when you use our platform.
               </p>
             </section>
 
