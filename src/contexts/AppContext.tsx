@@ -504,7 +504,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           blood_group: data.bloodGroup || "Unknown",
           pre_existing_conditions: data.medicalHistory ? JSON.stringify(data.medicalHistory) : null,
           email: data.gmail,
-          password: data.password
+          password: data.password,
+          lmp_date: data.lmpDate
         }),
       });
 
