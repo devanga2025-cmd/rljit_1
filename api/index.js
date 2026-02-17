@@ -19,6 +19,10 @@ app.use((req, res, next) => {
     next();
 });
 
+app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", message: "JananiSetu API is healthy", timestamp: new Date() });
+});
+
 app.get("/", (req, res) => {
     res.send("JananiSetu Backend Server is Running!");
 });
@@ -48,7 +52,7 @@ pool.connect()
    REGISTER - MOTHER
 ====================================================== */
 
-app.post("/api/register/mother", async (req, res) => {
+app.post(["/api/register/mother", "/register/mother"], async (req, res) => {
     console.log("POST /api/register/mother - Data:", { ...req.body, password: "****" });
     try {
         const {
@@ -110,7 +114,7 @@ app.post("/api/register/mother", async (req, res) => {
    REGISTER - FATHER
 ====================================================== */
 
-app.post("/api/register/father", async (req, res) => {
+app.post(["/api/register/father", "/register/father"], async (req, res) => {
     try {
         const {
             father_name,
@@ -149,7 +153,7 @@ app.post("/api/register/father", async (req, res) => {
    REGISTER - HEALTH WORKER
 ====================================================== */
 
-app.post("/api/register/healthworker", async (req, res) => {
+app.post(["/api/register/healthworker", "/register/healthworker"], async (req, res) => {
     try {
         const {
             full_name,
@@ -186,7 +190,7 @@ app.post("/api/register/healthworker", async (req, res) => {
    LOGIN (ALL ROLES)
 ====================================================== */
 
-app.post("/api/login", async (req, res) => {
+app.post(["/api/login", "/login"], async (req, res) => {
     try {
         const { email, password } = req.body;
 
@@ -228,7 +232,7 @@ app.post("/api/login", async (req, res) => {
    GET ALL MOTHERS (For Health Workers)
 ====================================================== */
 
-app.get("/api/mothers", async (req, res) => {
+app.get(["/api/mothers", "/mothers"], async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT m.*, u.email 

@@ -475,7 +475,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         body: JSON.stringify({ email, password }),
       });
 
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: Received invalid response from backend.");
+      }
       if (!response.ok) throw new Error(result.message || "Login failed");
 
       localStorage.setItem("token", result.token);
@@ -516,7 +523,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         }),
       });
 
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: Received invalid response from backend.");
+      }
       if (!response.ok) throw new Error(result.error || "Registration failed");
 
       toast.success("Mother registered successfully!");
@@ -547,7 +561,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           password: data.password
         }),
       });
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: Received invalid response from backend.");
+      }
       if (!response.ok) throw new Error(result.error || "Registration failed");
       toast.success("Father registered successfully!");
       return result;
@@ -574,7 +595,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           password: data.password
         }),
       });
-      const result = await response.json();
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: Received invalid response from backend.");
+      }
       if (!response.ok) throw new Error(result.error || "Registration failed");
       toast.success("Health Worker registered successfully!");
       return result;
@@ -592,7 +620,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const response = await fetch(`${API_URL}/api/mothers`);
       if (!response.ok) throw new Error("Failed to fetch mothers");
-      const data = await response.json();
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON response:", text);
+        throw new Error("Server error: Received invalid response from backend.");
+      }
 
       // Map backend data to frontend MotherData structure
       const mappedMothers: MotherData[] = data.map((m: any) => {
