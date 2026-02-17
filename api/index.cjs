@@ -250,16 +250,27 @@ app.get(["/api/mothers", "/mothers"], async (req, res) => {
     }
 });
 
-/* ======================================================
-   START SERVER
-====================================================== */
+// Trust proxy for Vercel
+app.set('trust proxy', 1);
 
+// Start Server
 const PORT = process.env.PORT || 5000;
 if (process.env.NODE_ENV !== "production") {
     app.listen(PORT, "0.0.0.0", () => {
         console.log(`JananiSetu server running on http://127.0.0.1:${PORT}`);
     });
 }
+
+// 404 Handler
+app.use((req, res) => {
+    console.log(`404 - Not Found: ${req.method} ${req.url}`);
+    res.status(404).json({
+        error: "Route not found",
+        method: req.method,
+        url: req.url,
+        path: req.path
+    });
+});
 
 // Global Error Handler (MUST BE LAST)
 app.use((err, req, res, next) => {

@@ -12,7 +12,7 @@
             "destination": "/api/index.cjs"
         },
         {
-            "source": "/(.*)",
+            "source": "/((?!api/|assets/|favicon.ico|manifest.json|sw.js|registerSW.js|robots.txt|app-icon.jpeg|pwa-|placeholder.svg|safe-exercises-pregnancy.png).*)",
             "destination": "/index.html"
         }
     ]
