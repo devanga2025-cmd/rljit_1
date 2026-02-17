@@ -36,6 +36,10 @@ const pool = new Pool({
     }
 });
 
+pool.on("error", (err) => {
+    console.error("Unexpected error on idle client", err);
+});
+
 pool.connect()
     .then(() => console.log("Connected to JananiSetu PostgreSQL Database"))
     .catch(err => console.error("Database connection error:", err));
@@ -45,6 +49,7 @@ pool.connect()
 ====================================================== */
 
 app.post("/api/register/mother", async (req, res) => {
+    console.log("POST /api/register/mother - Data:", { ...req.body, password: "****" });
     try {
         const {
             full_name,
@@ -59,14 +64,21 @@ app.post("/api/register/mother", async (req, res) => {
             password
         } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ error: "Email and password are required" });
+        }
+
+        console.log("Hashing password...");
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        console.log("Inserting user...");
         const userResult = await pool.query(
             "INSERT INTO users (role, email, password) VALUES ($1, $2, $3) RETURNING id",
             ["mother", email, hashedPassword]
         );
 
         const userId = userResult.rows[0].id;
+        console.log(`User created with ID: ${userId}. Inserting mother details...`);
 
         await pool.query(
             `INSERT INTO mothers
@@ -85,11 +97,12 @@ app.post("/api/register/mother", async (req, res) => {
             ]
         );
 
+        console.log("Registration successful!");
         res.json({ message: "Mother registered successfully" });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Registration failed" });
+        console.error("Registration Error:", error);
+        res.status(500).json({ error: error.message || "Registration failed" });
     }
 });
 

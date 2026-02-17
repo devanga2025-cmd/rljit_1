@@ -1689,6 +1689,9 @@ const MotherDashboard = () => {
             {/* Physical Preparation Guidance */}
             <div className="bg-card rounded-2xl p-5 shadow-card">
               <h3 className="font-heading font-bold text-card-foreground mb-4">Physical Preparation</h3>
+              <div className="mb-6 rounded-xl overflow-hidden shadow-md">
+                <img src="/safe-exercises-pregnancy.png" alt="Best Exercises During Pregnancy" className="w-full h-auto object-cover" />
+              </div>
               <div className="space-y-3">
                 {[
                   { title: "Regular Walking", desc: "20–30 minutes daily. Improves stamina & helps labor progress.", icon: "🚶‍♀️" },
