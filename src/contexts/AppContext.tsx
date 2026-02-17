@@ -466,12 +466,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /* ================= INTEGRATION: LOGIN ================= */
   const loginUser = useCallback(async (email: string, password: string) => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/login", {
+      console.log(`Attempting login to ${API_URL}/api/login`);
+      const response = await fetch(`${API_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || "Login failed");
 
@@ -480,17 +483,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toast.success("Login successful!");
       return result;
     } catch (error: any) {
-      toast.error(error.message || "Connection error");
+      console.error("Login Error:", error);
+      const msg = error.name === "TypeError" && error.message === "Failed to fetch"
+        ? "Cannot connect to server. Please ensure the backend is running."
+        : (error.message || "Connection error");
+      toast.error(msg);
       throw error;
     }
   }, []);
 
   /* ================= INTEGRATION: REGISTER MOTHER ================= */
   const registerMother = useCallback(async (data: Partial<MotherData>) => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
       console.log("Attempting to register mother:", data);
-      const apiUrl = "http://127.0.0.1:5000/api/register/mother";
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${API_URL}/api/register/mother`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -516,15 +523,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return result;
     } catch (error: any) {
       console.error("Registration Error:", error);
-      toast.error(error.message || "Failed to fetch. Server might be down.");
+      const msg = error.name === "TypeError" && error.message === "Failed to fetch"
+        ? "Cannot connect to server. Please ensure the backend is running."
+        : (error.message || "Registration failed");
+      toast.error(msg);
       throw error;
     }
   }, []);
 
   /* ================= INTEGRATION: REGISTER FATHER ================= */
   const registerFather = useCallback(async (data: any) => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/register/father", {
+      const response = await fetch(`${API_URL}/api/register/father`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -541,15 +552,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toast.success("Father registered successfully!");
       return result;
     } catch (error: any) {
-      toast.error(error.message || "Failed to fetch. Server might be down.");
+      const msg = error.name === "TypeError" && error.message === "Failed to fetch"
+        ? "Cannot connect to server. Please ensure the backend is running."
+        : (error.message || "Registration failed");
+      toast.error(msg);
       throw error;
     }
   }, []);
 
   /* ================= INTEGRATION: REGISTER WORKER ================= */
   const registerHealthWorker = useCallback(async (data: any) => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/register/healthworker", {
+      const response = await fetch(`${API_URL}/api/register/healthworker`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -564,14 +579,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toast.success("Health Worker registered successfully!");
       return result;
     } catch (error: any) {
-      toast.error(error.message || "Failed to fetch. Server might be down.");
+      const msg = error.name === "TypeError" && error.message === "Failed to fetch"
+        ? "Cannot connect to server. Please ensure the backend is running."
+        : (error.message || "Registration failed");
+      toast.error(msg);
       throw error;
     }
   }, []);
 
   const fetchMothers = useCallback(async () => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/mothers");
+      const response = await fetch(`${API_URL}/api/mothers`);
       if (!response.ok) throw new Error("Failed to fetch mothers");
       const data = await response.json();
 

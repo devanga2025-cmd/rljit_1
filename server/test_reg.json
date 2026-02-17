@@ -1,0 +1,10 @@
+{
+    "full_name": "Test Mother",
+    "age": 25,
+    "phone_number": "1234567890",
+    "village": "Test Village",
+    "location": "Test Location",
+    "email": "test@gmail.com",
+    "password": "password123",
+    "lmp_date": "2025-01-01"
+}
