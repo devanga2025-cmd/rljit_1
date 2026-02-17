@@ -466,7 +466,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /* ================= INTEGRATION: LOGIN ================= */
   const loginUser = useCallback(async (email: string, password: string) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
     try {
       console.log(`Attempting login to ${API_URL}/api/login`);
       const response = await fetch(`${API_URL}/api/login`, {
@@ -494,7 +494,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /* ================= INTEGRATION: REGISTER MOTHER ================= */
   const registerMother = useCallback(async (data: Partial<MotherData>) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
     try {
       console.log("Attempting to register mother:", data);
       const response = await fetch(`${API_URL}/api/register/mother`, {
@@ -533,7 +533,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /* ================= INTEGRATION: REGISTER FATHER ================= */
   const registerFather = useCallback(async (data: any) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
     try {
       const response = await fetch(`${API_URL}/api/register/father`, {
         method: "POST",
@@ -562,7 +562,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   /* ================= INTEGRATION: REGISTER WORKER ================= */
   const registerHealthWorker = useCallback(async (data: any) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
     try {
       const response = await fetch(`${API_URL}/api/register/healthworker`, {
         method: "POST",
@@ -588,7 +588,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const fetchMothers = useCallback(async () => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:5000");
     try {
       const response = await fetch(`${API_URL}/api/mothers`);
       if (!response.ok) throw new Error("Failed to fetch mothers");

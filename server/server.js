@@ -248,6 +248,10 @@ app.get("/api/mothers", async (req, res) => {
 ====================================================== */
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`JananiSetu server running on http://127.0.0.1:${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, "0.0.0.0", () => {
+        console.log(`JananiSetu server running on http://127.0.0.1:${PORT}`);
+    });
+}
+
+module.exports = app;
