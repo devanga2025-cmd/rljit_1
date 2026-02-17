@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 
-app.get("/", (req, res) => {
+app.get(["/", "/api", "/api/"], (req, res) => {
     res.send("JananiSetu Backend Server is Running!");
 });
 
@@ -38,7 +38,7 @@ const pool = new Pool({
 });
 
 // Health Check
-app.get("/api/health", (req, res) => {
+app.get(["/api/health", "/health"], (req, res) => {
     res.json({
         status: "ok",
         database: pool ? "connected" : "disconnected",
