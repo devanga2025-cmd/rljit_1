@@ -19,9 +19,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", message: "JananiSetu API is healthy", timestamp: new Date() });
-});
 
 app.get("/", (req, res) => {
     res.send("JananiSetu Backend Server is Running!");
@@ -112,7 +109,7 @@ app.post(["/api/register/mother", "/register/mother"], async (req, res) => {
 
     } catch (error) {
         console.error("Registration Error:", error);
-        res.status(500).json({ error: error.message || "Registration failed" });
+        res.status(500).json({ error: error.message || "Registration failed", details: error });
     }
 });
 
@@ -151,7 +148,7 @@ app.post(["/api/register/father", "/register/father"], async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Registration failed" });
+        res.status(500).json({ error: error.message || "Registration failed", details: error });
     }
 });
 
@@ -188,7 +185,7 @@ app.post(["/api/register/healthworker", "/register/healthworker"], async (req, r
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Registration failed" });
+        res.status(500).json({ error: error.message || "Registration failed", details: error });
     }
 });
 
@@ -230,7 +227,7 @@ app.post(["/api/login", "/login"], async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Login failed" });
+        res.status(500).json({ error: error.message || "Login failed", details: error });
     }
 });
 
