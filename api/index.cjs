@@ -40,13 +40,19 @@ const pool = new Pool({
     }
 });
 
-pool.on("error", (err) => {
-    console.error("Unexpected error on idle client", err);
+// Health Check
+app.get("/api/health", (req, res) => {
+    res.json({
+        status: "ok",
+        database: pool ? "connected" : "disconnected",
+        env: {
+            has_db_user: !!process.env.DB_USER,
+            has_db_host: !!process.env.DB_HOST,
+            has_jwt_secret: !!process.env.JWT_SECRET
+        }
+    });
 });
 
-pool.connect()
-    .then(() => console.log("Connected to JananiSetu PostgreSQL Database"))
-    .catch(err => console.error("Database connection error:", err));
 
 /* ======================================================
    REGISTER - MOTHER
@@ -257,5 +263,16 @@ if (process.env.NODE_ENV !== "production") {
         console.log(`JananiSetu server running on http://127.0.0.1:${PORT}`);
     });
 }
+
+// Global Error Handler (MUST BE LAST)
+app.use((err, req, res, next) => {
+    console.error("Global Error Handler:", err);
+    res.status(500).json({
+        error: "Internal Server Error",
+        message: err.message,
+        status: "error",
+        code: err.code || "UNKNOWN_ERROR"
+    });
+});
 
 module.exports = app;

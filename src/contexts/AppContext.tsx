@@ -481,7 +481,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         result = JSON.parse(text);
       } catch (e) {
         console.error("Server returned non-JSON response:", text);
-        throw new Error("Server error: Received invalid response from backend.");
+        throw new Error(`Server error: Invalid response (starts with: ${text.substring(0, 50)}...)`);
       }
       if (!response.ok) throw new Error(result.message || "Login failed");
 
@@ -529,7 +529,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         result = JSON.parse(text);
       } catch (e) {
         console.error("Server returned non-JSON response:", text);
-        throw new Error("Server error: Received invalid response from backend.");
+        throw new Error(`Server error: Invalid response (starts with: ${text.substring(0, 50)}...)`);
       }
       if (!response.ok) throw new Error(result.error || "Registration failed");
 
@@ -567,7 +567,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         result = JSON.parse(text);
       } catch (e) {
         console.error("Server returned non-JSON response:", text);
-        throw new Error("Server error: Received invalid response from backend.");
+        throw new Error(`Server error: Invalid response (starts with: ${text.substring(0, 50)}...)`);
       }
       if (!response.ok) throw new Error(result.error || "Registration failed");
       toast.success("Father registered successfully!");
@@ -601,7 +601,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         result = JSON.parse(text);
       } catch (e) {
         console.error("Server returned non-JSON response:", text);
-        throw new Error("Server error: Received invalid response from backend.");
+        throw new Error(`Server error: Invalid response (starts with: ${text.substring(0, 50)}...)`);
       }
       if (!response.ok) throw new Error(result.error || "Registration failed");
       toast.success("Health Worker registered successfully!");
@@ -626,7 +626,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         data = JSON.parse(text);
       } catch (e) {
         console.error("Server returned non-JSON response:", text);
-        throw new Error("Server error: Received invalid response from backend.");
+        throw new Error(`Server error: Invalid response (starts with: ${text.substring(0, 50)}...)`);
       }
 
       // Map backend data to frontend MotherData structure
